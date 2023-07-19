@@ -87,7 +87,7 @@ class Microscope:
 file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])  # Select excel file
 par_directory = file_path.rsplit('/', 1)[0]  # Slice selected excel file path to give a working directory to the microscope obkect
 filename = file_path.rsplit('/', 1)[1]
-
+filename = filename.rsplit('.', 1)[0]
 
 pxl_doc = openpyxl.load_workbook(file_path)  # Open Excel File
 sheet = pxl_doc.worksheets[0]  # Load first Excel sheet
