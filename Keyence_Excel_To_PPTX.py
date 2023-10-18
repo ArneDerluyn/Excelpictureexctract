@@ -83,6 +83,58 @@ class Microscope:
 
 
 
+def create_slide(mics_tuple, prs):
+
+
+    # select layout for slide
+    lay1 = prs.slide_layouts[6]
+
+    #create slide
+    slide = prs.slides.add_slide(lay1)
+
+
+    left = Cm(1)
+    top = Cm(1)
+    width = Cm(5)
+    inbetween = Cm(1)
+
+    for x in mics_tuple:
+        # Go to current directory
+        cur_path = os.path.join(x.parent_directory, x.name)
+        os.chdir(cur_path)
+        #  shapes = slide.shapes
+        #  shapes.title.text = self.name
+
+        text_box = slide.shapes.add_textbox(left, top, width=Cm(20), height=Cm(0.7))
+        text_frame = text_box.text_frame
+        text_frame.word_wrap = True
+
+        # Add text to the text frame
+        p = text_frame.paragraphs[0]
+        p.text = x.name
+
+        top = top + inbetween
+
+        pic1 = slide.shapes.add_picture(x.imagename_1, left, top, width)
+
+        left = left + width + inbetween
+        pic2 = slide.shapes.add_picture(x.imagename_2, left, top, width)
+
+        left = left + width + inbetween
+        pic3 = slide.shapes.add_picture(x.imagename_3, left, top, width)
+
+        left = left + width + inbetween
+        pic4 = slide.shapes.add_picture(x.imagename_4, left, top, width)
+
+        top = top + Cm(5)
+        left=Cm(1)
+        os.chdir(x.parent_directory)
+
+    #####
+
+
+    return prs
+
 
 file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])  # Select excel file
 par_directory = file_path.rsplit('/', 1)[0]  # Slice selected excel file path to give a working directory to the microscope obkect
@@ -97,6 +149,7 @@ content = tuple(sheet.rows)  # Tuple containing all the filled cells => iterable
 presentation = Presentation()
 
 
+"""
 i = 2
 while i < len(content):
     mic = Microscope(content[i],par_directory)
@@ -104,6 +157,33 @@ while i < len(content):
     mic.save_images()
     presentation = mic.create_slide(presentation)
     i = i+1
+"""
+
+i = 2
+mics = []
+while i < len(content):
+    mic1 = Microscope(content[i],par_directory)
+    mic1.load_images()
+    mic1.save_images()
+    mics.append(mic1)
+    i = i+1
+    if i < len(content):
+        mic2 = Microscope(content[i],par_directory)
+        mic2.load_images()
+        mic2.save_images()
+        mics.append(mic2)
+        i = i+1
+    if i < len(content):
+        mic3 = Microscope(content[i],par_directory)
+        mic3.load_images()
+        mic3.save_images()
+        mics.append(mic3)
+        i = i+1
+
+    presentation = create_slide(mics, presentation)
+    mics = []
+
+
 
 
 presentation.save(filename + '.pptx')
